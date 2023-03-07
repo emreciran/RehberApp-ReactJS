@@ -1,8 +1,9 @@
+import Cookies from "js-cookie";
 import React, { useEffect } from "react";
 import { axiosPrivate } from "../axios";
 
 const useAxiosPrivate = () => {
-  const userToken = JSON.parse(localStorage.getItem("token"));
+  const userToken = Cookies.get("jwt")
 
   useEffect(() => {
     const requestIntercept = axiosPrivate.interceptors.request.use(

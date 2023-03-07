@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import { Formik } from "formik";
 import { RegisterSchema } from "../../validations";
 import ErrorMessage from "../../components/ErrorMessage";
+import LoadingButton from '@mui/lab/LoadingButton';
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -20,6 +21,8 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -47,10 +50,12 @@ const Register = () => {
 
   const handleFormSubmit = async (values) => {
     try {
+      setLoading(true)
       await RegisterUser(values);
       navigate("/auth/login");
     } catch (error) {
       if (error) {
+        setLoading(false)
         notify(error.response.data.message);
       }
     }
@@ -173,15 +178,17 @@ const Register = () => {
                 )}
               </Grid>
             </Grid>
-            <Button
+            <LoadingButton
               type="submit"
               fullWidth
-              disabled={!dirty || isSubmitting}
               variant="contained"
+              disabled={!dirty || isSubmitting}
               sx={{ mt: 3, mb: 2 }}
+              loading={loading}
+              loadingIndicator="Loading…"
             >
-              Sign Up
-            </Button>
+              <span>Sign Up</span>
+            </LoadingButton>
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Link to="/auth/login" style={{ color: "#1976d2" }}>

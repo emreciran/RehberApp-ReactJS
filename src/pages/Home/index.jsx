@@ -7,10 +7,7 @@ const Home = () => {
 
   return (
     <Container maxWidth="xl">
-      <h4>Ad: {user?.family_name}</h4>
-      <h4>Soyad: {user?.family_name}</h4>
-      <h4>Email: {user?.sub}</h4>
-      <h4>Username: {user?.name}</h4>
+
     </Container>
   );
 };

@@ -8,19 +8,23 @@ import SpeedDialAction from "@mui/material/SpeedDialAction";
 import CreateIcon from "@mui/icons-material/Create";
 import { useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { useSelector } from "react-redux";
 
 const actions = [
   { icon: <CreateIcon />, name: "New", navigate: "/persons/create" },
 ];
 
 const PersonList = () => {
+  const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const [persons, setPersons] = useState();
 
   const axiosPrivate = useAxiosPrivate();
 
   const fetchAllPersons = async () => {
-    const personsData = await axiosPrivate.get("/persons");
+    const personsData = await axiosPrivate.get(
+      "/persons/GetPersonByUser/" + user?.nameid
+    );
     setPersons(personsData.data);
   };
 

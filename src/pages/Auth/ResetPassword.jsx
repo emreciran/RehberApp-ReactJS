@@ -6,29 +6,23 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { LoginUser } from "../../api/Auth";
 import { Formik } from "formik";
-import { LoginSchema } from "../../validations";
+import { ResetPasswordSchema } from "../../validations";
 import ErrorMessage from "../../components/ErrorMessage";
-import { useDispatch } from "react-redux";
-import { login } from "../../store/auth";
-import LoadingButton from '@mui/lab/LoadingButton';
+import { ResetPasswordReq } from "../../api/Auth";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
-const Login = () => {
-  const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false)
+const ResetPassword = () => {
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  let [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const navigate = useNavigate();
 
-  const notify = (error) => {
-    toast.error(error, {
+  const notify = (msg) => {
+    toast.success(msg, {
       position: "top-center",
       autoClose: 5000,
       hideProgressBar: false,
@@ -40,40 +34,20 @@ const Login = () => {
     });
   };
 
-  if (searchParams.get("confirmEmail") != null) {
-    toast.success(
-      "Email adresiniz onaylandı. Hesabınıza giriş yapabilirsiniz.",
-      {
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      }
-    );
-  }
-
   const initialValues = {
-    email,
-    password,
+    Email: searchParams.get("email"),
+    Token: searchParams.get("token"),
+    newPassword,
+    confirmPassword,
   };
 
   const handleFormSubmit = async (values) => {
     try {
-      setLoading(true)
-      const response = await LoginUser(values);
-      dispatch(login(response.data.authResult.token));
-      navigate("/", {
-        replace: true,
-      });
+      await ResetPasswordReq(values);
+      notify("Şifreniz başarıyla değiştirildi!");
+      navigate("/auth/login");
     } catch (error) {
-      if (error) {
-        setLoading(false)
-        notify(error.response.data.message);
-      }
+      console.log(error);
     }
   };
 
@@ -90,12 +64,12 @@ const Login = () => {
         <LockOutlinedIcon />
       </Avatar>
       <Typography component="h1" variant="h5">
-        Sign in
+        Reset Password
       </Typography>
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
-        validationSchema={LoginSchema}
+        validationSchema={ResetPasswordSchema}
       >
         {({
           values,
@@ -118,13 +92,14 @@ const Login = () => {
                   margin="normal"
                   required
                   fullWidth
-                  id="email"
-                  label="Email"
-                  name="email"
+                  id="newPassword"
+                  label="New Password"
+                  type="password"
+                  name="newPassword"
                   onChange={handleChange}
                 />
-                {errors.email && touched.email && (
-                  <ErrorMessage error={errors.email} />
+                {errors.newPassword && touched.newPassword && (
+                  <ErrorMessage error={errors.newPassword} />
                 )}
               </Grid>
               <Grid item xs={12}>
@@ -132,40 +107,26 @@ const Login = () => {
                   margin="normal"
                   required
                   fullWidth
-                  name="password"
-                  label="Password"
+                  name="confirmPassword"
+                  label="Confirm Password"
                   type="password"
-                  id="password"
+                  id="confirmPassword"
                   onChange={handleChange}
                 />
-                {errors.password && touched.password && (
-                  <ErrorMessage error={errors.password} />
+                {errors.confirmPassword && touched.confirmPassword && (
+                  <ErrorMessage error={errors.confirmPassword} />
                 )}
               </Grid>
             </Grid>
-            <LoadingButton
+            <Button
               type="submit"
               fullWidth
               variant="contained"
               disabled={!dirty || isSubmitting}
               sx={{ mt: 3, mb: 2 }}
-              loading={loading}
-              loadingIndicator="Loading…"
             >
-              <span>Sign In</span>
-            </LoadingButton>
-            <Grid container justifyContent="space-between">
-              <Grid item>
-                <Link to="/auth/forgot_password" style={{ color: "#1976d2" }}>
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link to="/auth/register" style={{ color: "#1976d2" }}>
-                  Don't have an account? Sign Up
-                </Link>
-              </Grid>
-            </Grid>
+              Reset Password
+            </Button>
           </Box>
         )}
       </Formik>
@@ -173,4 +134,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ResetPassword;

@@ -7,9 +7,11 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { MuiTelInput } from "mui-tel-input";
 import Button from "@mui/material/Button";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { useSelector } from "react-redux";
 
 const UpdatePersonModal = ({ person, open, setOpen }) => {
   const axiosPrivate = useAxiosPrivate();
+  const { user } = useSelector((state) => state.auth);
 
   const [name, setName] = useState(person.persoN_NAME);
   const [surname, setSurname] = useState(person.persoN_SURNAME);
@@ -31,6 +33,7 @@ const UpdatePersonModal = ({ person, open, setOpen }) => {
   const updatePerson = async () => {
     const data = {
       persoN_ID: person.persoN_ID,
+      USER_ID: user?.nameid,
       persoN_NAME: name,
       persoN_SURNAME: surname,
       persoN_PHONE: phone,

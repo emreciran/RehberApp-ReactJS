@@ -4,12 +4,14 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 import Typography from "@mui/material/Typography";
-import { CreatePerson } from "../../api/Persons";
 import { MuiTelInput } from "mui-tel-input";
 import Container from "@mui/material/Container";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { useSelector } from "react-redux";
 
 const NewPerson = () => {
+  const { user } = useSelector((state) => state.auth);
+
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [phone, setPhone] = useState("");
@@ -24,6 +26,7 @@ const NewPerson = () => {
     e.preventDefault();
     const formData = new FormData();
 
+    formData.append("USER_ID", user?.nameid);
     formData.append("PERSON_NAME", name);
     formData.append("PERSON_SURNAME", surname);
     formData.append("PERSON_PHONE", phone);
@@ -44,7 +47,7 @@ const NewPerson = () => {
 
   return (
     <Container maxWidth="md">
-      <Box padding={10}>
+      <Box padding={5}>
         <Typography component="h5" variant="h5">
           Yeni Kullanıcı Ekle
         </Typography>
