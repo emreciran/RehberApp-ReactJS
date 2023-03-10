@@ -1,38 +1,28 @@
 import React, { useState } from "react";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
-import { toast } from "react-toastify";
 import { Formik } from "formik";
 import { ResetPasswordSchema } from "../../validations";
 import ErrorMessage from "../../components/ErrorMessage";
 import { ResetPasswordReq } from "../../api/Auth";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import useToast from "../../hooks/useToast";
+import { LoadingButton } from "@mui/lab";
 
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const [loading, setLoading] = useState(false);
+
+  const [_showToast] = useToast();
 
   const navigate = useNavigate();
-
-  const notify = (msg) => {
-    toast.success(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
-  };
 
   const initialValues = {
     Email: searchParams.get("email"),
@@ -43,13 +33,19 @@ const ResetPassword = () => {
 
   const handleFormSubmit = async (values) => {
     try {
+      setLoading(true);
       await ResetPasswordReq(values);
-      notify("Şifreniz başarıyla değiştirildi!");
+      _showToast.showToast("success", "Şifreniz başarıyla değiştirildi!");
       navigate("/auth/login");
     } catch (error) {
-      console.log(error);
+      setLoading(false);
+      _showToast.showToast("error", error.response.data.message);
     }
   };
+
+  if (searchParams.get("email") == null || searchParams.get("token") == null) {
+    return <Navigate to="/auth/login" replace="true" />;
+  }
 
   return (
     <Box
@@ -118,15 +114,16 @@ const ResetPassword = () => {
                 )}
               </Grid>
             </Grid>
-            <Button
+            <LoadingButton
               type="submit"
               fullWidth
               variant="contained"
               disabled={!dirty || isSubmitting}
-              sx={{ mt: 3, mb: 2 }}
+              loading={loading}
+              loadingIndicator="Loading..."
             >
-              Reset Password
-            </Button>
+              <span>Reset Password</span>
+            </LoadingButton>
           </Box>
         )}
       </Formik>

@@ -8,10 +8,13 @@ import { MuiTelInput } from "mui-tel-input";
 import Button from "@mui/material/Button";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useSelector } from "react-redux";
+import useToast from "../../hooks/useToast";
 
 const UpdatePersonModal = ({ person, open, setOpen }) => {
   const axiosPrivate = useAxiosPrivate();
   const { user } = useSelector((state) => state.auth);
+
+  const [_showToast] = useToast();
 
   const [name, setName] = useState(person.persoN_NAME);
   const [surname, setSurname] = useState(person.persoN_SURNAME);
@@ -31,19 +34,23 @@ const UpdatePersonModal = ({ person, open, setOpen }) => {
   };
 
   const updatePerson = async () => {
-    const data = {
-      persoN_ID: person.persoN_ID,
-      USER_ID: user?.nameid,
-      persoN_NAME: name,
-      persoN_SURNAME: surname,
-      persoN_PHONE: phone,
-      persoN_DETAILS: details,
-      ImageName: person.imageName,
-    };
+    try {
+      const data = {
+        persoN_ID: person.persoN_ID,
+        USER_ID: user?.nameid,
+        persoN_NAME: name,
+        persoN_SURNAME: surname,
+        persoN_PHONE: phone,
+        persoN_DETAILS: details,
+        ImageName: person.imageName,
+      };
 
-    await axiosPrivate.put("/persons", data);
-    setOpen(false);
-    window.location.reload();
+      await axiosPrivate.put("/persons", data);
+      setOpen(false);
+      window.location.reload();
+    } catch (error) {
+      _showToast.showToast("error", error.response.data.message);
+    }
   };
 
   return (

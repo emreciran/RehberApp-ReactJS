@@ -8,7 +8,7 @@ import Button from "@mui/material/Button";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../store/auth";
-import { toast } from "react-toastify";
+import useToast from "../../hooks/useToast";
 
 const UpdatePswModal = ({ openPswUpdateModal, setOpenPswUpdateModal }) => {
   const [currPassword, setCurrPassword] = useState("");
@@ -20,36 +20,12 @@ const UpdatePswModal = ({ openPswUpdateModal, setOpenPswUpdateModal }) => {
   const axiosPrivate = useAxiosPrivate();
   const dispatch = useDispatch();
 
+  const [_showToast] = useToast();
+
   const handleClose = () => {
     setOpenPswUpdateModal(false);
     setPassword("");
     setConfirmPassword("");
-  };
-
-  const notifySuccess = (msg) => {
-    toast.success(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
-  };
-
-  const notifyError = (error) => {
-    toast.error(error, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
   };
 
   const data = {
@@ -62,10 +38,13 @@ const UpdatePswModal = ({ openPswUpdateModal, setOpenPswUpdateModal }) => {
   const updateUserPsw = async () => {
     try {
       const response = await axiosPrivate.put("/users/UpdatePassword", data);
-      notifySuccess(response.data.message + " Tekrar giriş yapınız.")
+      _showToast.showToast(
+        "success",
+        response.data.message + " Tekrar giriş yapınız."
+      );
       dispatch(logout());
     } catch (error) {
-        notifyError(error.response.data.message)
+      _showToast.showToast("error", error.response.data.message);
     }
   };
 
@@ -86,7 +65,7 @@ const UpdatePswModal = ({ openPswUpdateModal, setOpenPswUpdateModal }) => {
         <TextField
           margin="dense"
           id="password"
-          label="Password"
+          label="New Password"
           type="password"
           fullWidth
           variant="standard"

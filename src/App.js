@@ -5,12 +5,10 @@ import routes from "./routes";
 
 const App = () => {
   return (
-    <>
-      <main>
-        <RouterProvider router={routes} />
-        <ToastContainer />
-      </main>
-    </>
+    <main>
+      <RouterProvider router={routes} />
+      <ToastContainer />
+    </main>
   );
 };
 

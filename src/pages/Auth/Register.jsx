@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
@@ -8,11 +7,11 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { Link, useNavigate } from "react-router-dom";
 import { RegisterUser } from "../../api/Auth";
-import { toast } from "react-toastify";
 import { Formik } from "formik";
 import { RegisterSchema } from "../../validations";
 import ErrorMessage from "../../components/ErrorMessage";
-import LoadingButton from '@mui/lab/LoadingButton';
+import LoadingButton from "@mui/lab/LoadingButton";
+import useToast from "../../hooks/useToast";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -22,22 +21,11 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [_showToast] = useToast();
+
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-
-  const notify = (error) => {
-    toast.error(error, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
-  };
 
   const initialValues = {
     name,
@@ -50,13 +38,13 @@ const Register = () => {
 
   const handleFormSubmit = async (values) => {
     try {
-      setLoading(true)
+      setLoading(true);
       await RegisterUser(values);
       navigate("/auth/login");
     } catch (error) {
       if (error) {
-        setLoading(false)
-        notify(error.response.data.message);
+        setLoading(false);
+        _showToast.showToast("error", error.response.data.message);
       }
     }
   };

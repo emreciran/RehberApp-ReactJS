@@ -9,43 +9,19 @@ import Button from "@mui/material/Button";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useDispatch } from "react-redux";
 import { logout } from "../../store/auth";
-import { toast } from "react-toastify";
+import useToast from "../../hooks/useToast";
 
 const UpdateProfileModal = ({ openUpdateModal, setOpenUpdateModal }) => {
   const { user } = useSelector((state) => state.auth);
   const axiosPrivate = useAxiosPrivate();
   const dispatch = useDispatch()
 
+  const [_showToast] = useToast();
+
   const [name, setName] = useState(user.given_name);
   const [surname, setSurname] = useState(user.family_name);
   const [username, setUsername] = useState(user.name);
   const [email, setEmail] = useState(user.sub);
-
-  const notifySuccess = (msg) => {
-    toast.success(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
-  };
-
-  const notifyError = (error) => {
-    toast.error(error, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
-  };
 
   const data = {
     USER_ID: user.nameid,
@@ -58,10 +34,10 @@ const UpdateProfileModal = ({ openUpdateModal, setOpenUpdateModal }) => {
   const updateProfile = async () => {
     try {
       const response = await axiosPrivate.put("/users", data);
-      notifySuccess(response.data.message + " Tekrar giriş yapınız.")
+      _showToast.showToast("success", response.data.message + " Tekrar giriş yapınız.")
       dispatch(logout())
     } catch (error) {
-      notifyError(error.response.data.message)
+      _showToast.showToast("error", error.response.data.message)
     }
   };
 

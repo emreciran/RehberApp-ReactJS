@@ -1,58 +1,37 @@
 import React, { useState } from "react";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { toast } from "react-toastify";
 import { LoginUser } from "../../api/Auth";
 import { Formik } from "formik";
 import { LoginSchema } from "../../validations";
 import ErrorMessage from "../../components/ErrorMessage";
 import { useDispatch } from "react-redux";
 import { login } from "../../store/auth";
-import LoadingButton from '@mui/lab/LoadingButton';
+import LoadingButton from "@mui/lab/LoadingButton";
+import useToast from "../../hooks/useToast";
 
 const Login = () => {
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [_showToast] = useToast();
 
   let [searchParams, setSearchParams] = useSearchParams();
 
   const navigate = useNavigate();
 
-  const notify = (error) => {
-    toast.error(error, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
-  };
-
   if (searchParams.get("confirmEmail") != null) {
-    toast.success(
-      "Email adresiniz onaylandı. Hesabınıza giriş yapabilirsiniz.",
-      {
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      }
+    _showToast.showToast(
+      "success",
+      "Email adresiniz onaylandı. Hesabınıza giriş yapabilirsiniz."
     );
   }
 
@@ -63,17 +42,22 @@ const Login = () => {
 
   const handleFormSubmit = async (values) => {
     try {
-      setLoading(true)
+      setLoading(true);
       const response = await LoginUser(values);
       dispatch(login(response.data.authResult.token));
-      navigate("/", {
-        replace: true,
-      });
-    } catch (error) {
-      if (error) {
-        setLoading(false)
-        notify(error.response.data.message);
+
+      if (response.data.role.includes("Admin")) {
+        navigate("/admin", {
+          replace: true,
+        });
+      } else {
+        navigate("/", {
+          replace: true,
+        });
       }
+    } catch (error) {
+      setLoading(false);
+      _showToast.showToast("error", error.response.data.message);
     }
   };
 

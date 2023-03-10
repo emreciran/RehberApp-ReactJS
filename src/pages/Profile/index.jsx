@@ -58,6 +58,12 @@ const Profile = () => {
                 </Typography>{" "}
                 {user?.sub}
               </Typography>
+              <Typography component="h4" marginBottom={1}>
+                <Typography component="span" variant="span" color="#777">
+                  Role:
+                </Typography>{" "}
+                {user?.role}
+              </Typography>
               <ButtonGroup sx={{ gap: 1 }}>
                 <Button
                   size="medium"

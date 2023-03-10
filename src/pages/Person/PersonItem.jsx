@@ -8,10 +8,13 @@ import Swal from "sweetalert2";
 import Button from "@mui/material/Button";
 import UpdatePersonModal from "./UpdatePersonModal";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import useToast from "../../hooks/useToast";
 
 const PersonItem = ({ person, fetchAllPersons }) => {
   const [open, setOpen] = useState(false);
   const axiosPrivate = useAxiosPrivate();
+
+  const [_showToast] = useToast();
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -35,6 +38,7 @@ const PersonItem = ({ person, fetchAllPersons }) => {
       .then(async (result) => {
         if (result.isConfirmed) {
           await axiosPrivate.delete(`/persons/${person.persoN_ID}`);
+          _showToast.showToast("success", "Kullanıcı silindi!");
           await fetchAllPersons();
           swalWithBootstrapButtons.fire(
             "Silindi!",

@@ -15,6 +15,8 @@ import Profile from "../pages/Profile";
 import ProtectedRoute from "../components/ProtectedRoute";
 import ForgotPassword from "../pages/Auth/ForgotPassword";
 import ResetPassword from "../pages/Auth/ResetPassword";
+import AdminLayout from "../layouts/AdminLayout";
+import Admin from "../pages/Admin";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -27,6 +29,9 @@ const routes = createBrowserRouter(
             <Route index element={<PersonList />} />
             <Route path="create" element={<NewPerson />} />
           </Route>
+        </Route>
+        <Route path="admin" element={<AdminLayout allowedRoles={["Admin"]} />}>
+          <Route index element={<Admin />} />
         </Route>
       </Route>
       <Route path="auth" element={<AuthLayout />}>
